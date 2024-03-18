@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--@application: UniversalGiftRegistry
+ * @author: Alexander Schoolcraft, Benjamin King, Brandon King, Gabe Woolums
+ * @date: 3/14/2024
+ * @version: 0.1
+ -->
+<?import javafx.scene.image.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane fx:id="anchor" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="759.0" prefWidth="1062.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.group_8.universal_gift_registry.LandingPageController">
+   <children>
+      <Text layoutX="418.0" layoutY="87.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome To">
+         <font>
+            <Font name="Broadway" size="35.0" />
+         </font>
+      </Text>
+      <Text layoutX="253.0" layoutY="136.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Universal Gift Registry!">
+         <font>
+            <Font name="Broadway" size="45.0" />
+         </font>
+      </Text>
+      <Text layoutX="163.0" layoutY="206.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Modify your lists!" underline="true">
+         <font>
+            <Font name="Georgia Bold" size="20.0" />
+         </font>
+      </Text>
+      <Button fx:id="newList" layoutX="202.0" layoutY="540.0" mnemonicParsing="false" onAction="#handleNewListAction" text="Create new list" />
+      <Button fx:id="searchLists" layoutX="772.0" layoutY="395.0" mnemonicParsing="false" text="Find a list" onAction="#handleSearchListAction" />
+      <TextField fx:id="searchEmail" layoutX="740.0" layoutY="337.0" promptText="User's Email" />
+      <TableView fx:id="listOfLists" layoutX="79.0" layoutY="228.0" prefHeight="266.0" prefWidth="349.0">
+        <columns>
+          <TableColumn fx:id="listName" prefWidth="117.0" text="List" />
+          <TableColumn fx:id="Occasion" prefWidth="231.0" text="Occasion" />
+        </columns>
+      </TableView>
+      <Text layoutX="712.0" layoutY="293.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Shop for someone!" underline="true">
+         <font>
+            <Font name="Georgia Bold" size="20.0" />
+         </font>
+      </Text>
+      <ImageView fitHeight="266.0" fitWidth="284.0" layoutX="429.0" layoutY="227.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@UGR%20Logo.jpg" />
+         </image>
+      </ImageView>
+      <Label fx:id="noListsFound" alignment="CENTER" layoutX="171.0" layoutY="324.0" prefHeight="33.0" prefWidth="155.0" text="Label" textAlignment="CENTER" wrapText="true" />
+      <Button fx:id="editList" layoutX="222.0" layoutY="506.0" mnemonicParsing="false" onAction="#handleEditListAction" text="Edit List" />
+   </children>
+</AnchorPane>
