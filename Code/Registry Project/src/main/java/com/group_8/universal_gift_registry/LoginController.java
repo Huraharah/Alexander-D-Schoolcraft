@@ -1,37 +1,42 @@
 package com.group_8.universal_gift_registry;
 /**@application: UniversalGiftRegistry
  * @author: Alexander Schoolcraft, Benjamin King, Brandon King, Gabe Woolums
- * @date: 3/14/2024
- * @version: 0.1
+ * @date: 3/21/2024
+ * @version: 3.0
  */
+
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import com.group_8.universal_gift_registry.model.UserEntity;
+import com.group_8.universal_gift_registry.util.GetConnectionUtil;
+import com.group_8.universal_gift_registry.util.HashingUtils;
+import com.group_8.universal_gift_registry.util.ShowAlertUtil;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+
 /**JFX Controller class for the Login/Register scene
- * Enables the user to register, login, and retrieve password, while creating the persistent
+ * Enables the user to register, login, and reset password, while creating the persistent
  * user entity to track which user is logged into the system.
  */
 
@@ -82,8 +87,8 @@ public class LoginController {
      * @throws ClassNotFoundException
      */
     private boolean emailExists(String email) throws ClassNotFoundException {
-        String query = "SELECT COUNT(*) FROM User WHERE Email = ?";
-        try (Connection conn = getConnection();
+        String query = "SELECT COUNT(*) FROM [User] WHERE Email = ?";
+        try (Connection conn = GetConnectionUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, email);
             ResultSet rs = pstmt.executeQuery();
@@ -96,19 +101,7 @@ public class LoginController {
         return false;
     }
 
-    /**getConnection uses the information for the SQL database to generate a connection with
-     * the back-end server to store information.
-     * @return DriverManager connection object using the required information to connect
-     * @throws SQLException
-     * @throws ClassNotFoundException
-     */
-    private Connection getConnection() throws SQLException, ClassNotFoundException {
-        String url = "jdbc:sqlserver://ugr.database.windows.net:1433;database=universal_gift_registry;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;";
-        String user = "UGRAdmin@ugr";
-        String password = "UGRP@ssw0rd!";
-        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        return DriverManager.getConnection(url, user, password);
-    }
+
 
     /**handleLoginButtonAction first confirms that the login screen is filled out correctly,
      * then confirms that the user email and password match what is in the database, and if
@@ -123,7 +116,7 @@ public class LoginController {
 
         try {
             if (!agreeLogin.isSelected()) {
-                showAlert("Login Error", "You must agree to the Terms and Conditions.");
+                ShowAlertUtil.showAlert("Login Error", "You must agree to the Terms and Conditions.");
                 return;
             }
 
@@ -131,10 +124,10 @@ public class LoginController {
             if (currentUser != null) {
                 switchToLandingPage(currentUser);
             } else {
-                showAlert("Login Error", "Incorrect email or password.");
+                ShowAlertUtil.showAlert("Login Error", "Incorrect email or password.");
             }
         } catch (Exception e) {
-            showAlert("Database Error", "Error while logging in: " + e.getMessage());
+            ShowAlertUtil.showAlert("Database Error", "Error while logging in: " + e.getMessage());
         }
     }
     @FXML
@@ -156,15 +149,34 @@ public class LoginController {
             return;
         }
         if (!agreeReg.isSelected()) {
-            showAlert("Validation Error", "You must agree to the Terms and Conditions.");
+            ShowAlertUtil.showAlert("Validation Error", "You must agree to the Terms and Conditions.");
             return;
         }
 
 
-        String query = "INSERT INTO [User] ([Email], [Street_Address], [City], [State], [Zip], [First_Name], [Last_Name], [Password]) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String hashedPassword;
+        String salt;
+        String shadowHash;
+        try {
+            shadowHash= HashingUtils.generateStrongPasswordHash(passwordReg.getText());
+            salt = shadowHash.split(":")[1];
+            hashedPassword = shadowHash.split(":")[2];
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            ShowAlertUtil.showAlert("Hashing Error", "Error hashing password: " + e.getMessage());
+            return;
+        }
+        
+        ArrayList<String> hashedAnswers = showSetSecurityQuestionsScreen(salt);
+        if (hashedAnswers == null || hashedAnswers.size() != 4) {
+            ShowAlertUtil.showAlert("Security Questions", "You must choose and answer the security questions to complete registration.");
+            return;
+        }
+
+        String query = "INSERT INTO [User] ([Email], [Street_Address], [City], [State], [Zip], [First_Name], [Last_Name], [Password], [Salt],"
+        		+ "[SecurityQuestion1Code], [SecurityAnswer1], [SecurityQuestion2Code], [SecurityAnswer2]) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try {
-            Connection conn = getConnection();
+            Connection conn = GetConnectionUtil.getConnection();
             try (PreparedStatement pstmt = conn.prepareStatement(query)) {
                 pstmt.setString(1, emailReg.getText());
                 pstmt.setString(2, streetAddress.getText());
@@ -173,93 +185,88 @@ public class LoginController {
                 pstmt.setString(5, zip.getText());
                 pstmt.setString(6, firstName.getText());
                 pstmt.setString(7, lastName.getText());
-                pstmt.setString(8, passwordReg.getText());
-                pstmt.executeUpdate();//builds the SQL query to post to the server and sends it
-                showInformationAlert("Registration Successful", "You are now registered");
+                pstmt.setString(8, hashedPassword);
+                pstmt.setString(9, salt);
+                pstmt.setString(10, hashedAnswers.get(0));
+                pstmt.setString(11, hashedAnswers.get(1));
+                pstmt.setString(12, hashedAnswers.get(2));
+                pstmt.setString(13, hashedAnswers.get(3));
+                pstmt.executeUpdate();
+                ShowAlertUtil.showInformationAlert("Registration Successful", "You are now registered");
             } catch (SQLException ex) {
-                showAlert("Database Error", "Error inserting new user: " + ex.getMessage());
+                ShowAlertUtil.showAlert("Database Error", "Error inserting new user: " + ex.getMessage());
             }
         } catch (ClassNotFoundException e) {
-            showAlert("Driver Error", "MySQL JDBC driver not found");
+            ShowAlertUtil.showAlert("Driver Error", "MSSQL JDBC driver not found");
         } catch (SQLException e) {
-            showAlert("Database Error", "Error connecting to the database: " + e.getMessage());
+            ShowAlertUtil.showAlert("Database Error", "Error connecting to the database: " + e.getMessage());
+        }
+    }
+
+    private ArrayList<String> showSetSecurityQuestionsScreen(String salt) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/pages/Set_Security_Questions.fxml"));
+            Parent root = loader.load();
+
+            SetSecurityQuestionsController secQuestionsController = loader.getController();
+            secQuestionsController.setSalt(salt);
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initOwner(tabPane.getScene().getWindow());
+            stage.showAndWait();
+            return secQuestionsController.getHashedAnswers();
+        } catch (IOException e) {
+            ShowAlertUtil.showAlert("UI Error", "Error loading the security questions screen: " + e.getMessage());
+            return null;
         }
     }
 
 
-    /**Connects to the server, verifies that the user exists, and retrieves the password for the user
-     * ALERT: THIS IS NOT A SECURE WAY TO RETRIEVE PASSWORDS, AND ONLY DONE WITHIN THE CLASS ASSIGNMENT
-     * If this was turned into a production application, this method would be heavily changed, to email
-     * the user a link to reset the password. Additionally, the passwords would not be stored in the
-     * database as plain-text, but they would be hashed, as would all comparisons to the password, which
-     * would not allow for this method of retrieval anyways.
+    /**Connects to the server, verifies that the user exists, and then pulls up the security questions for the user. Then, once it has confirmed this, opens a pop-up with
+     * the questions for the user to answer to confirm their identity, then allows them to update their password.
      * @throws ClassNotFoundException
      */
     private void retrievePassword() throws ClassNotFoundException {
         String email = emailForgot.getText();
-        String query = "SELECT [Password] FROM [User] WHERE [Email] = ?";
-
-        try (Connection conn = getConnection();
+        
+        String query = "SELECT [SecurityQuestion1Code], [SecurityQuestion2Code] FROM [User] WHERE [Email] = ?";
+        
+        try (Connection conn = GetConnectionUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, email);
-
+            
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    String password = rs.getString("Password");
-                    passwordRetrieved.setText("Your password is: " + password);
+                    openSecurityQuestionsWindow(email);
                 } else {
-                    showAlert("Retrieve Password", "No account found for this email.");
+                    ShowAlertUtil.showAlert("Forgot Password", "No account found for this email.");
                 }
             }
         } catch (SQLException ex) {
-            showAlert("Database Error", "Error retrieving password: " + ex.getMessage());
+            ShowAlertUtil.showAlert("Database Error", "Error checking user email: " + ex.getMessage());
         }
     }
 
-    /**showAlert method builds and displays a warning-type alert message to the user
-     * This alert is specifically a scrolling-type alert box, in case the message is
-     * too long to fit into the standardized window size (such as a file path).
-     * @param title: The header of the alert
-     * @param content: The content of the alert box
-     */
-    private void showAlert(String title, String content) {
-        TextArea textArea = new TextArea(content);
-        textArea.setEditable(false);
-        textArea.setWrapText(false);
-
-        textArea.setFont(javafx.scene.text.Font.font("Monospaced", 12));
-
-        textArea.setPrefRowCount(10);
-        textArea.setPrefColumnCount(50);
-
-        textArea.setMaxWidth(Double.MAX_VALUE);
-        textArea.setMaxHeight(Double.MAX_VALUE);
-        GridPane.setVgrow(textArea, Priority.ALWAYS);
-        GridPane.setHgrow(textArea, Priority.ALWAYS);
-
-        GridPane expContent = new GridPane();
-        expContent.setMaxWidth(Double.MAX_VALUE);
-        expContent.add(textArea, 0, 1);
-
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.getDialogPane().setContent(expContent);
-
-        alert.showAndWait();
-    }
-
-    /**showInformationAlert shows an information-type alert (A blue circle icon) to the user
-     * This method specifically is used to show an action has been completed successfully
-     * @param title: The header of the alert
-     * @param content: The content of the alert box
-     */
-    private void showInformationAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
+    private void openSecurityQuestionsWindow(String email) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/pages/Answer_Security_Question.fxml"));
+            Parent root = loader.load();
+            
+            AnswerSecurityQuestionsController controller = loader.getController();
+            controller.setUserEmail(email);
+            
+            Stage stage = new Stage();
+            stage.setTitle("Answer Security Questions");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(emailForgot.getScene().getWindow());
+            stage.show();
+            
+        } catch (IOException e) {
+            ShowAlertUtil.showAlert("UI Error", "Error loading the security questions screen: " + e.getMessage());
+        }
     }
 
     @FXML
@@ -309,15 +316,15 @@ public class LoginController {
             zip.getText().isEmpty() || firstName.getText().isEmpty() ||
             lastName.getText().isEmpty() || passwordReg.getText().isEmpty() ||
             passwordConf.getText().isEmpty()) { //checking that all fields are filled out
-            showAlert("Validation Error", "All fields must be filled out");
+            ShowAlertUtil.showAlert("Validation Error", "All fields must be filled out");
             return false;
         }
         if (emailExists(emailReg.getText())) {
-            showAlert("Validation Error", "Email already exists");
+            ShowAlertUtil.showAlert("Validation Error", "Email already exists");
             return false;
         }
         if (!passwordReg.getText().equals(passwordConf.getText())) {
-            showAlert("Validation Error", "Passwords do not match");
+            ShowAlertUtil.showAlert("Validation Error", "Passwords do not match");
             return false;
         }
         return true;
@@ -332,22 +339,66 @@ public class LoginController {
      * @throws ClassNotFoundException
      */
     private UserEntity verifyLogin(String email, String password) throws SQLException, ClassNotFoundException {
-        String query = "SELECT * FROM [User] WHERE [Email] = ? AND [Password] = ?";
-        try (Connection conn = getConnection();
+        String query = "SELECT [Salt], [Password] FROM [User] WHERE [Email] = ?";
+        String storedHash = null;
+        String storedSalt = null;
+
+        try (Connection conn = GetConnectionUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, email);
-            pstmt.setString(2, password);
-            ResultSet rs = pstmt.executeQuery();
-
-            if (rs.next()) {
-                currentUser = new UserEntity();
-                currentUser.setEmail(rs.getString("Email"));
-                currentUser.setFirstName(rs.getString("First_Name"));
-                currentUser.setLastName(rs.getString("Last_Name"));
-                return currentUser;
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    storedSalt = rs.getString("Salt");
+                    storedHash = rs.getString("Password");
+                } else {
+                	ShowAlertUtil.showAlert("Error", "Incorrect email or password");
+                    return null;
+                }
             }
-            return null;
         }
+
+        if (storedSalt != null) {
+            String hashedInputPassword;
+            try {
+                hashedInputPassword = HashingUtils.hashWithExistingSalt(password, storedSalt);
+            } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+                ShowAlertUtil.showAlert("Server Error", "Error recieving information from server: " + e);
+                return null;
+            }
+
+
+            if (hashedInputPassword.equals(storedHash)) {
+            	String query1 = "SELECT [Email], [Street_Address], [City], [State], [Zip], [First_Name], [Last_Name], [Salt], [Password] FROM [User] WHERE [Email] = ?";
+            	try (Connection conn = GetConnectionUtil.getConnection();
+            	        PreparedStatement pstmt = conn.prepareStatement(query1)) {
+		            	pstmt.setString(1, email);
+		                try (ResultSet rs = pstmt.executeQuery()) {
+		                    if (rs.next()) {
+		                    	currentUser = new UserEntity(
+			                        rs.getString("Email"),
+			                        rs.getString("Street_Address"),
+			                        rs.getString("City"),
+			                        rs.getString("State"),
+			                        rs.getString("Zip"),
+			                        rs.getString("First_Name"),
+			                        rs.getString("Last_Name"),
+			                        rs.getString("Salt"));
+		                    	return currentUser;
+		                    }
+		                } catch (SQLException e) {
+		                	ShowAlertUtil.showAlert("Error", "Server Error: " + e);
+		                }
+            	} catch (ClassNotFoundException e) {
+            		ShowAlertUtil.showAlert("Error", "Login Error: " + e);
+            	}
+            }
+            else {
+            	ShowAlertUtil.showAlert("Error", "Incorrect email or password");
+            }
+        }
+
+        return null;
     }
+
 }

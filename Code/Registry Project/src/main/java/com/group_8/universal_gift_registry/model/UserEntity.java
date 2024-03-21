@@ -1,8 +1,8 @@
 package com.group_8.universal_gift_registry.model;
 /**@application: UniversalGiftRegistry
  * @author: Alexander Schoolcraft, Benjamin King, Brandon King, Gabe Woolums
- * @date: 3/14/2024
- * @version: 0.1
+ * @date: 3/21/2024
+ * @version: 3.0
  */
 public class UserEntity {
 
@@ -13,14 +13,14 @@ public class UserEntity {
     private String zip;
     private String firstName;
     private String lastName;
-    private String password;
+    private String salt;
 
 	public UserEntity() {
 	}
 
 
 	public UserEntity(String email, String streetAddress, String city, String state, String zip, String firstName,
-			String lastName, String password) {
+			String lastName, String salt) {
 		this.email = email;
 		this.streetAddress = streetAddress;
 		this.city = city;
@@ -28,7 +28,7 @@ public class UserEntity {
 		this.zip = zip;
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.password = password;
+		this.salt = salt;
 	}
 
 
@@ -46,10 +46,6 @@ public class UserEntity {
 
 	public String getLastName() {
 		return lastName;
-	}
-
-	public String getPassword() {
-		return password;
 	}
 
 	public String getState() {
@@ -80,10 +76,6 @@ public class UserEntity {
 		this.lastName = lastName;
 	}
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
 	public void setState(String state) {
 		this.state = state;
 	}
@@ -95,4 +87,15 @@ public class UserEntity {
 	public void setZip(String zip) {
 		this.zip = zip;
 	}
+
+
+	public String getSalt() {
+		return salt;
+	}
+
+
+	public void setSalt(String salt) {
+		this.salt = salt;
+	}
+	
 }

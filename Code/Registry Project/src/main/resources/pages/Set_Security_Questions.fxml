@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- @application: UniversalGiftRegistry
+ * @author: Alexander Schoolcraft, Benjamin King, Brandon King, Gabe Woolums
+ * @date: 3/21/2024
+ * @version: 3.0
+ -->
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<TitledPane alignment="CENTER" animated="false" contentDisplay="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" text="Set Security Questions" textAlignment="CENTER" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="com.group_8.universal_gift_registry.SetSecurityQuestionsController">
+  <content>
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+         <children>
+            <ComboBox fx:id="secQuestionOne" layoutX="134.0" layoutY="45.0" prefHeight="23.0" prefWidth="330.0" promptText="Select Question 1:" />
+            <ComboBox fx:id="secQuestionTwo" layoutX="134.0" layoutY="188.0" prefHeight="23.0" prefWidth="330.0" promptText="Select Question 2:" />
+            <PasswordField fx:id="secAnswerOne" layoutX="134.0" layoutY="110.0" prefWidth="330.0" promptText="Answer 1" />
+            <PasswordField fx:id="secAnswerTwo" layoutX="134.0" layoutY="253.0" prefWidth="330.0" promptText="Answer 2" />
+            <Button layoutX="271.0" layoutY="311.0" mnemonicParsing="false" onAction="#handleSubmit" text="Submit" />
+         </children></AnchorPane>
+  </content>
+</TitledPane>

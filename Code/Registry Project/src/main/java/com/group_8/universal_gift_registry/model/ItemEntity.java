@@ -1,8 +1,8 @@
 package com.group_8.universal_gift_registry.model;
 /**@application: UniversalGiftRegistry
  * @author: Alexander Schoolcraft, Benjamin King, Brandon King, Gabe Woolums
- * @date: 3/14/2024
- * @version: 0.1
+ * @date: 3/21/2024
+ * @version: 3.0
  */
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;

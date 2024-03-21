@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--@application: UniversalGiftRegistry
  * @author: Alexander Schoolcraft, Benjamin King, Brandon King, Gabe Woolums
- * @date: 3/14/2024
- * @version: 0.1
+ * @date: 3/21/2024
+ * @version: 3.0
  -->
  
 <?import javafx.scene.text.*?>

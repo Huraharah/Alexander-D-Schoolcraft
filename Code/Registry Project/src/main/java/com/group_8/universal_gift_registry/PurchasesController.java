@@ -1,13 +1,12 @@
 package com.group_8.universal_gift_registry;
 /**@application: UniversalGiftRegistry
  * @author: Alexander Schoolcraft, Benjamin King, Brandon King, Gabe Woolums
- * @date: 3/14/2024
- * @version: 0.1
+ * @date: 3/21/2024
+ * @version: 3.0
  */
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,6 +14,8 @@ import java.sql.SQLException;
 import com.group_8.universal_gift_registry.model.ItemEntity;
 import com.group_8.universal_gift_registry.model.ListEntity;
 import com.group_8.universal_gift_registry.model.UserEntity;
+import com.group_8.universal_gift_registry.util.GetConnectionUtil;
+import com.group_8.universal_gift_registry.util.ShowAlertUtil;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -28,12 +29,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
 import javafx.scene.web.WebHistory;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -80,20 +78,6 @@ public class PurchasesController {
     @FXML
     private Button ReturnToHome;
 
-    /**getConnection uses the information for the SQL database to generate a connection with
-     * the back-end server to store information.
-     * @return DriverManager connection object using the required information to connect
-     * @throws SQLException
-     * @throws ClassNotFoundException
-     */
-    private Connection getConnection() throws SQLException, ClassNotFoundException {
-        String url = "jdbc:sqlserver://ugr.database.windows.net:1433;database=universal_gift_registry;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;";
-        String user = "UGRAdmin@ugr";
-        String password = "UGRP@ssw0rd!";
-        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        return DriverManager.getConnection(url, user, password);
-    }
-
 	/**The next two methods enable to Back and Forward buttons on the scene to act like they would
 	 * in a real browser.
 	 * @param event
@@ -126,7 +110,7 @@ public class PurchasesController {
         if (selectedItem != null) {
             WebView.getEngine().load(selectedItem.getItemURL());
         } else {
-            showAlert("Selection Error", "Please select an item.");
+            ShowAlertUtil.showAlert("Selection Error", "Please select an item.");
         }
     }
 
@@ -141,16 +125,17 @@ public class PurchasesController {
         ItemEntity selectedItem = CurrentList.getSelectionModel().getSelectedItem();
         if (selectedItem != null && !selectedItem.getPurchased()) {
             String updateQuery = "UPDATE [Item] SET [Purchased] = 1 WHERE [ItemID] = ?";
-            try (Connection conn = getConnection(); PreparedStatement pstmt = conn.prepareStatement(updateQuery)) {
+            try (Connection conn = GetConnectionUtil.getConnection(); PreparedStatement pstmt = conn.prepareStatement(updateQuery)) {
                 pstmt.setInt(1, selectedItem.getItemID());
                 pstmt.executeUpdate();
                 selectedItem.setPurchased(true);
                 CurrentList.refresh();
+                ShowAlertUtil.showInformationAlert("Success!", "Item information updated to \"Purchased\"");
             } catch (SQLException e) {
-                showAlert("Database Error", "Error updating item status: " + e.getMessage());
+                ShowAlertUtil.showAlert("Database Error", "Error updating item status: " + e.getMessage());
             }
         } else {
-            showAlert("Selection Error", "Please select an unpurchased item.");
+            ShowAlertUtil.showAlert("Selection Error", "Please select an unpurchased item.");
         }
     }
 
@@ -173,7 +158,7 @@ public class PurchasesController {
             stage.show();
 
         } catch (IOException e) {
-            showAlert("Navigation Error", "Error when trying to return to the home page: " + e.getMessage());
+            ShowAlertUtil.showAlert("Navigation Error", "Error when trying to return to the home page: " + e.getMessage());
         }
     }
 
@@ -219,7 +204,7 @@ public class PurchasesController {
 	    ObservableList<ItemEntity> items = FXCollections.observableArrayList();
 	    String query = "SELECT * FROM [Item] WHERE [ListID] = ?";
 
-	    try (Connection conn = getConnection();
+	    try (Connection conn = GetConnectionUtil.getConnection();
 	         PreparedStatement pstmt = conn.prepareStatement(query)) {
 
 	        pstmt.setInt(1, currentList.getListID());
@@ -244,7 +229,7 @@ public class PurchasesController {
 	        CurrentList.setItems(items);
 	    } catch (SQLException | ClassNotFoundException e) {
 
-	        showAlert("Database Error", "Error loading list items: " + e.getMessage());
+	        ShowAlertUtil.showAlert("Database Error", "Error loading list items: " + e.getMessage());
 	    }
 	}
     /**Called from the prior scene to pass the currently selected ListEntity.
@@ -268,37 +253,4 @@ public class PurchasesController {
     public void setSearchedUser(UserEntity user) {
 		searchedUser = user;
 	}
-
-	/**showAlert method builds and displays a warning-type alert message to the user
-     * This alert is specifically a scrolling-type alert box, in case the message is
-     * too long to fit into the standardized window size (such as a file path).
-     * @param title: The header of the alert
-     * @param content: The content of the alert box
-     */
-    private void showAlert(String title, String content) {
-        TextArea textArea = new TextArea(content);
-        textArea.setEditable(false);
-        textArea.setWrapText(false);
-
-        textArea.setFont(javafx.scene.text.Font.font("Monospaced", 12));
-
-        textArea.setPrefRowCount(10);
-        textArea.setPrefColumnCount(50);
-
-        textArea.setMaxWidth(Double.MAX_VALUE);
-        textArea.setMaxHeight(Double.MAX_VALUE);
-        GridPane.setVgrow(textArea, Priority.ALWAYS);
-        GridPane.setHgrow(textArea, Priority.ALWAYS);
-
-        GridPane expContent = new GridPane();
-        expContent.setMaxWidth(Double.MAX_VALUE);
-        expContent.add(textArea, 0, 1);
-
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.getDialogPane().setContent(expContent);
-
-        alert.showAndWait();
-    }
 }

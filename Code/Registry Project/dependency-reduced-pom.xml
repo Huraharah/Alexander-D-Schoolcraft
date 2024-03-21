@@ -4,7 +4,7 @@
   <groupId>com.group_8</groupId>
   <artifactId>universal_gift_registry</artifactId>
   <name>universal_gift_registry</name>
-  <version>2.0</version>
+  <version>3.0</version>
   <description>Universal Gift Registry project for SWE.</description>
   <build>
     <plugins>

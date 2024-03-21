@@ -1,19 +1,21 @@
 package com.group_8.universal_gift_registry;
 /**@application: UniversalGiftRegistry
  * @author: Alexander Schoolcraft, Benjamin King, Brandon King, Gabe Woolums
- * @date: 3/14/2024
- * @version: 0.1
+ * @date: 3/21/2024
+ * @version: 3.0
  */
+
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.group_8.universal_gift_registry.model.ListEntity;
 import com.group_8.universal_gift_registry.model.UserEntity;
+import com.group_8.universal_gift_registry.util.GetConnectionUtil;
 import com.group_8.universal_gift_registry.util.OccasionUtil;
+import com.group_8.universal_gift_registry.util.ShowAlertUtil;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,17 +24,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 
 /**JFX Controller class for the Landing Page scene
@@ -63,20 +61,6 @@ public class LandingPageController {
     @FXML
     private Button editList;
 
-    /**getConnection uses the information for the SQL database to generate a connection with
-     * the back-end server to store information.
-     * @return DriverManager connection object using the required information to connect
-     * @throws SQLException
-     * @throws ClassNotFoundException
-     */
-    private Connection getConnection() throws SQLException, ClassNotFoundException {
-        String url = "jdbc:sqlserver://ugr.database.windows.net:1433;database=universal_gift_registry;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;";
-        String user = "UGRAdmin@ugr";
-        String password = "UGRP@ssw0rd!";
-        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        return DriverManager.getConnection(url, user, password);
-    }
-
     /**Checks for a selected list from the table of lists, then, if found, moves onto the Edit List
      * page, creating a persistent ListEntity of the list selected to edit
      * @param event
@@ -88,7 +72,7 @@ public class LandingPageController {
         if (selectedList != null) {
             switchToEditListPage(selectedList);
         } else {
-            showAlert("Selection Error", "Please select a list to edit.");
+            ShowAlertUtil.showAlert("Selection Error", "Please select a list to edit.");
         }
     }
 
@@ -115,7 +99,7 @@ public class LandingPageController {
         String email = searchEmail.getText();
         
         if(email != null) {
-	        try (Connection conn = getConnection();
+	        try (Connection conn = GetConnectionUtil.getConnection();
 	             PreparedStatement pstmt = conn.prepareStatement(query)) {
 	
 	            pstmt.setString(1, email);
@@ -131,7 +115,7 @@ public class LandingPageController {
 	       
         	}
         else {
-        	showAlert("Error", "Please enter user email to search");
+        	ShowAlertUtil.showAlert("Error", "Please enter user email to search");
         }
         
     }
@@ -151,7 +135,7 @@ public class LandingPageController {
 	    ObservableList<ListEntity> userLists = FXCollections.observableArrayList();
 	    String query = "SELECT [ListID], [ListName], [Occasion], [Email] FROM [List] WHERE [Email] = ?";
 
-	    try (Connection conn = getConnection();
+	    try (Connection conn = GetConnectionUtil.getConnection();
 	         PreparedStatement pstmt = conn.prepareStatement(query)) {
 
 	        pstmt.setString(1, currentUser.getEmail());
@@ -176,7 +160,7 @@ public class LandingPageController {
 	        }
 
 	    } catch (SQLException | ClassNotFoundException e) {
-	        showAlert("Database Error", "Error loading user lists: " + e.getMessage());
+	        ShowAlertUtil.showAlert("Database Error", "Error loading user lists: " + e.getMessage());
 	    }
 	}
 
@@ -187,39 +171,6 @@ public class LandingPageController {
 		currentUser = user;
         loadUserLists();
 	}
-
-	/**showAlert method builds and displays a warning-type alert message to the user
-     * This alert is specifically a scrolling-type alert box, in case the message is
-     * too long to fit into the standardized window size (such as a file path).
-     * @param title: The header of the alert
-     * @param content: The content of the alert box
-     */
-    private void showAlert(String title, String content) {
-        TextArea textArea = new TextArea(content);
-        textArea.setEditable(false);
-        textArea.setWrapText(false);
-
-        textArea.setFont(javafx.scene.text.Font.font("Monospaced", 12));
-
-        textArea.setPrefRowCount(10);
-        textArea.setPrefColumnCount(50);
-
-        textArea.setMaxWidth(Double.MAX_VALUE);
-        textArea.setMaxHeight(Double.MAX_VALUE);
-        GridPane.setVgrow(textArea, Priority.ALWAYS);
-        GridPane.setHgrow(textArea, Priority.ALWAYS);
-
-        GridPane expContent = new GridPane();
-        expContent.setMaxWidth(Double.MAX_VALUE);
-        expContent.add(textArea, 0, 1);
-
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.getDialogPane().setContent(expContent);
-
-        alert.showAndWait();
-    }
 
     /**If the user selects a list of their own to edit, this method will switch the scene over to the
      * edit list scene, passing both the selected list, as well as the current user, to add or remove

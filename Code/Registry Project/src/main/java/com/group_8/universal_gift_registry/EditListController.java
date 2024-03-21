@@ -1,13 +1,12 @@
 package com.group_8.universal_gift_registry;
 /**@application: UniversalGiftRegistry
  * @author: Alexander Schoolcraft, Benjamin King, Brandon King, Gabe Woolums
- * @date: 3/14/2024
- * @version: 0.1
+ * @date: 3/21/2024
+ * @version: 3.0
  */
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,6 +17,8 @@ import java.util.List;
 import com.group_8.universal_gift_registry.model.ItemEntity;
 import com.group_8.universal_gift_registry.model.ListEntity;
 import com.group_8.universal_gift_registry.model.UserEntity;
+import com.group_8.universal_gift_registry.util.GetConnectionUtil;
+import com.group_8.universal_gift_registry.util.ShowAlertUtil;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -31,13 +32,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
 import javafx.scene.web.WebHistory;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -84,20 +82,6 @@ public class EditListController {
     @FXML
     private Button ReturnToHome;
 
-    /**getConnection uses the information for the SQL database to generate a connection with
-     * the back-end server to store information.
-     * @return DriverManager connection object using the required information to connect
-     * @throws SQLException
-     * @throws ClassNotFoundException
-     */
-    private Connection getConnection() throws SQLException, ClassNotFoundException {
-        String url = "jdbc:sqlserver://ugr.database.windows.net:1433;database=universal_gift_registry;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;";
-        String user = "UGRAdmin@ugr";
-        String password = "UGRP@ssw0rd!";
-        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        return DriverManager.getConnection(url, user, password);
-    }
-
 
     /**This method scrapes the webpage data for the specific details needed to fill the item entity in both
      * the database as well as the persistent entity within the front side.
@@ -141,7 +125,7 @@ public class EditListController {
         try {
             getCurrentProductDetails();
         } catch (Exception e) {
-            showAlert("Error", "Failed to add the product: " + e.getMessage());
+            ShowAlertUtil.showAlert("Error", "Failed to add the product: " + e.getMessage());
         }
     }
 
@@ -185,6 +169,8 @@ public class EditListController {
             removeItemsFromDatabase(itemsToRemove);
             CurrentList.getItems().removeAll(itemsToRemove);
             CurrentList.refresh();
+            String listName = currentList.getListName();
+            ShowAlertUtil.showInformationAlert("Success", "Items removed from list " + listName);
         }
     }
 
@@ -207,7 +193,7 @@ public class EditListController {
             stage.show();
 
         } catch (IOException e) {
-            showAlert("Navigation Error", "Error when trying to return to the home page: " + e.getMessage());
+            ShowAlertUtil.showAlert("Navigation Error", "Error when trying to return to the home page: " + e.getMessage());
         }
     }
 
@@ -256,7 +242,7 @@ public class EditListController {
 	 */
     private void insertNewItem(ItemEntity item) throws ClassNotFoundException {
         String query = "INSERT INTO [Item] ([ItemURL], [ItemImage], [ItemName], [ItemSize], [ItemColor], [ItemPrice], [Purchased], [Email], [ListID]) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = getConnection();
+        try (Connection conn = GetConnectionUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, item.getItemURL());
             pstmt.setString(2, item.getImgURL());
@@ -276,12 +262,14 @@ public class EditListController {
             try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     item.setItemID(generatedKeys.getInt(1));
+                    String listName = currentList.getListName();
+                    ShowAlertUtil.showInformationAlert("Succsess!", "Item successfully added to list " + listName);
                 } else {
                     throw new SQLException("Creating item failed, no ID obtained.");
                 }
             }
         } catch (SQLException e) {
-            showAlert("Database Error", "Error adding new item: " + e.getMessage());
+            ShowAlertUtil.showAlert("Database Error", "Error adding new item: " + e.getMessage());
         }
     }
 
@@ -293,7 +281,7 @@ public class EditListController {
 	    ObservableList<ItemEntity> items = FXCollections.observableArrayList();
 	    String query = "SELECT * FROM [Item] WHERE [ListID] = ?";
 
-	    try (Connection conn = getConnection();
+	    try (Connection conn = GetConnectionUtil.getConnection();
 	         PreparedStatement pstmt = conn.prepareStatement(query)) {
 
 	        pstmt.setInt(1, currentList.getListID());
@@ -318,7 +306,7 @@ public class EditListController {
 	        CurrentList.setItems(items);
 	    } catch (SQLException | ClassNotFoundException e) {
 
-	        showAlert("Database Error", "Error loading list items: " + e.getMessage());
+	        ShowAlertUtil.showAlert("Database Error", "Error loading list items: " + e.getMessage());
 	    }
 	}
 
@@ -330,7 +318,7 @@ public class EditListController {
      */
 	private void removeItemsFromDatabase(List<ItemEntity> itemsToRemove) throws SQLException, ClassNotFoundException {
         String query = "DELETE FROM [Item] WHERE [ItemID] = ?";
-        try (Connection conn = getConnection();
+        try (Connection conn = GetConnectionUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             for (ItemEntity item : itemsToRemove) {
@@ -339,7 +327,7 @@ public class EditListController {
             }
             pstmt.executeBatch();
         } catch (SQLException e) {
-            showAlert("Database Error", "Error deleting items: " + e.getMessage());
+            ShowAlertUtil.showAlert("Database Error", "Error deleting items: " + e.getMessage());
         }
     }
 
@@ -357,37 +345,4 @@ public class EditListController {
     public void setCurrentUser(UserEntity user) {
 		currentUser = user;
 	}
-
-    /**showAlert method builds and displays a warning-type alert message to the user
-     * This alert is specifically a scrolling-type alert box, in case the message is
-     * too long to fit into the standardized window size (such as a file path).
-     * @param title: The header of the alert
-     * @param content: The content of the alert box
-     */
-    private void showAlert(String title, String content) {
-        TextArea textArea = new TextArea(content);
-        textArea.setEditable(false);
-        textArea.setWrapText(false);
-
-        textArea.setFont(javafx.scene.text.Font.font("Monospaced", 12));
-
-        textArea.setPrefRowCount(10);
-        textArea.setPrefColumnCount(50);
-
-        textArea.setMaxWidth(Double.MAX_VALUE);
-        textArea.setMaxHeight(Double.MAX_VALUE);
-        GridPane.setVgrow(textArea, Priority.ALWAYS);
-        GridPane.setHgrow(textArea, Priority.ALWAYS);
-
-        GridPane expContent = new GridPane();
-        expContent.setMaxWidth(Double.MAX_VALUE);
-        expContent.add(textArea, 0, 1);
-
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.getDialogPane().setContent(expContent);
-
-        alert.showAndWait();
-    }
 }

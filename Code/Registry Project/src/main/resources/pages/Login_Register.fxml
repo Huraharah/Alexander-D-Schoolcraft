@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--@application: UniversalGiftRegistry
  * @author: Alexander Schoolcraft, Benjamin King, Brandon King, Gabe Woolums
- * @date: 3/14/2024
- * @version: 0.1
+ * @date: 3/21/2024
+ * @version: 3.0
  -->
 
 <?import javafx.scene.image.*?>
@@ -151,7 +151,7 @@
          <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                <children>
-                  <Button fx:id="retrievePasswordButton" layoutX="343.0" layoutY="140.0" mnemonicParsing="false" onAction="#handleRetrievePasswordAction" text="Retrieve Password" />
+                  <Button fx:id="retrievePasswordButton" layoutX="343.0" layoutY="140.0" mnemonicParsing="false" onAction="#handleRetrievePasswordAction" text="Reset Password" />
                   <Hyperlink fx:id="toLoginHyperlinkFromForgotPassword" layoutX="382.0" layoutY="259.0" onAction="#switchToLogin" text="Log In" />
                   <TextField fx:id="emailForgot" layoutX="336.0" layoutY="100.0" prefHeight="23.0" prefWidth="137.0" promptText="Email" />
                   <Text layoutX="327.0" layoutY="51.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome To">
