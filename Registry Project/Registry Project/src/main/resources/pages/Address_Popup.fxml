@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+
+<AnchorPane fx:id="anchor" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="216.0" prefWidth="424.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.group_8.universal_gift_registry.AddressPopupController">
+   <children>
+      <Text fx:id="headline" layoutY="22.0" strokeType="OUTSIDE" strokeWidth="0.0" text="'s Address" textAlignment="CENTER" wrappingWidth="424.0">
+         <font>
+            <Font name="Broadway" size="20.0" />
+         </font>
+      </Text>
+      <TextArea fx:id="addressBox" layoutY="37.0" prefHeight="135.0" prefWidth="424.0" wrapText="true" />
+      <Button layoutX="188.0" layoutY="179.0" mnemonicParsing="false" onAction="#closeWindow" text="Close" />
+   </children>
+</AnchorPane>

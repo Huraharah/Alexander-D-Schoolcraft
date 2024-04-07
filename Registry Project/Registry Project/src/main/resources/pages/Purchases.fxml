@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--@application: UniversalGiftRegistry
+ * @author: Alexander Schoolcraft, Benjamin King, Brandon King, Gabe Woolums
+ * @date: 3/21/2024
+ * @version: 3.0
+ -->
+
+<?import javafx.scene.web.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane fx:id="Purchase" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="899.0" prefWidth="1310.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.group_8.universal_gift_registry.PurchasesController">
+   <children>
+      <TableView fx:id="CurrentList" layoutX="3.0" prefHeight="160.0" prefWidth="1304.0">
+        <columns>
+          <TableColumn fx:id="ItemName" prefWidth="482.0" text="Item Name" />
+          <TableColumn fx:id="URL" minWidth="8.0" prefWidth="429.0" text="URL" />
+          <TableColumn fx:id="ItemColor" prefWidth="83.0" text="Color" />
+          <TableColumn fx:id="ItemSize" prefWidth="131.0" text="Size" />
+          <TableColumn fx:id="ItemPrice" minWidth="0.0" prefWidth="56.0" text="Price" />
+          <TableColumn fx:id="Purchased" prefWidth="96.0" text="Purchased" />
+        </columns>
+      </TableView>
+      <TextField fx:id="AddressBar" layoutX="83.0" layoutY="863.0" prefHeight="23.0" prefWidth="1175.0" promptText="URL: http://" />
+	  <Button fx:id="GoButton" layoutX="1263.0" layoutY="863.0" text="Go" />
+      <WebView fx:id="WebView" layoutX="3.0" layoutY="195.0" prefHeight="666.0" prefWidth="1304.0" />
+      <Button fx:id="GoTo" layoutX="489.0" layoutY="165.0" mnemonicParsing="false" onAction="#handleGoToAction" text="Go To Item" />
+      <Button fx:id="PurchasedItem" layoutX="602.0" layoutY="165.0" mnemonicParsing="false" onAction="#handlePurchaseAction" text="Purchased Item" />
+      <Button fx:id="Back" layoutX="14.0" layoutY="863.0" mnemonicParsing="false" onAction="#handleBackAction" text="&lt;" />
+      <Button fx:id="Forward" layoutX="51.0" layoutY="863.0" mnemonicParsing="false" onAction="#handleForwardAction" text="&gt;" />
+      <Button fx:id="ReturnToHome" layoutX="730.0" layoutY="165.0" mnemonicParsing="false" onAction="#handleReturnToHome" text="Return to Home" />
+      <Button fx:id="showAddress" layoutX="902.0" layoutY="165.0" mnemonicParsing="false" onAction="#handleShowAddress" text="Show User's Address" />
+      <Button layoutX="324.0" layoutY="165.0" mnemonicParsing="false" onAction="#handleBackToLists" text="Back to User's Lists" />
+   </children>
+</AnchorPane>

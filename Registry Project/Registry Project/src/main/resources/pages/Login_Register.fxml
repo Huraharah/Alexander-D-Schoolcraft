@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--@application: UniversalGiftRegistry
+ * @author: Alexander Schoolcraft, Benjamin King, Brandon King, Gabe Woolums
+ * @date: 3/21/2024
+ * @version: 3.0
+ -->
+
+<?import javafx.scene.image.*?>
+<?import javafx.collections.*?>
+<?import javafx.scene.web.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.shape.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.*?>
+<?import java.lang.String?>
+
+<TabPane fx:id="tabPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.group_8.universal_gift_registry.LoginController">
+  <tabs>
+    <Tab fx:id="loginTab" text="Log In">
+      <content>
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <Button layoutX="378.0" layoutY="244.0" mnemonicParsing="false" onAction="#handleLoginButtonAction" text="Log In" />
+                  <Hyperlink layoutX="376.0" layoutY="306.0" onAction="#switchToRegister" text="Register" />
+                  <Hyperlink layoutX="361.0" layoutY="175.0" onAction="#switchToForgotPassword" text="Forgot Password?" />
+                  <TextField fx:id="emailLogin" layoutX="347.0" layoutY="115.0" promptText="Email" />
+                  <PasswordField fx:id="passwordLogin" layoutX="347.0" layoutY="145.0" promptText="Password" />
+                  <Text layoutX="327.0" layoutY="51.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome To">
+                     <font>
+                        <Font name="Broadway" size="24.0" />
+                     </font>
+                  </Text>
+                  <Text layoutX="249.0" layoutY="80.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Universal Gift Registry">
+                     <font>
+                        <Font name="Broadway" size="26.0" />
+                     </font>
+                  </Text>
+                  <Text layoutX="351.0" layoutY="112.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Log In:" />
+                  <Text layoutX="353.0" layoutY="297.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Need an account?" />
+                  <CheckBox fx:id="agreeLogin" layoutX="318.0" layoutY="196.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="196.0" text="I agree to the Terms and Conditions and Privacy Policy" wrapText="true" />
+                  <ImageView fitHeight="224.0" fitWidth="205.0" layoutX="31.0" layoutY="83.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@UGR%20Logo.jpg" />
+                     </image>
+                  </ImageView>
+               </children></AnchorPane>
+      </content>
+    </Tab>
+      <Tab fx:id="registerTab" text="Register">
+         <content>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <Button fx:id="RegisterAcct" layoutX="347.0" layoutY="274.0" mnemonicParsing="false" onAction="#handleRegisterButtonAction" text="Register Account" defaultButton="true" />
+                  <Hyperlink fx:id="toLoginHyperlinkFromRegister" layoutX="377.0" layoutY="324.0" onAction="#switchToLogin" text="Log In" />
+                  <Text layoutX="327.0" layoutY="51.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome To">
+                     <font>
+                        <Font name="Broadway" size="24.0" />
+                     </font>
+                  </Text>
+                  <Text layoutX="249.0" layoutY="80.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Universal Gift Registry">
+                     <font>
+                        <Font name="Broadway" size="26.0" />
+                     </font>
+                  </Text>
+                  <Text layoutX="331.0" layoutY="321.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Already have an account?" />
+                  <CheckBox fx:id="agreeReg" layoutX="235.0" layoutY="251.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="339.0" text="I agree to the Terms and Conditions and Privacy Policy" wrapText="true" />
+                  <TextField fx:id="firstName" layoutX="262.0" layoutY="107.0" promptText="First Name" />
+                  <TextField fx:id="lastName" layoutX="413.0" layoutY="107.0" promptText="Last Name" />
+                  <TextField fx:id="streetAddress" layoutX="262.0" layoutY="137.0" promptText="Street Address" />
+                  <TextField fx:id="city" layoutX="413.0" layoutY="137.0" promptText="City" />
+                  <ComboBox fx:id="state" layoutX="415.0" layoutY="169.0" prefHeight="23.0" prefWidth="75.0" promptText="State">
+                  	<items>
+				        <FXCollections fx:factory="observableArrayList">
+				            <String fx:value="AL" />
+				            <String fx:value="AK" />
+				            <String fx:value="AZ" />
+				            <String fx:value="AR" />
+				            <String fx:value="CA" />
+				            <String fx:value="CO" />
+				            <String fx:value="CT" />
+				            <String fx:value="DE" />
+				            <String fx:value="FL" />
+				            <String fx:value="GA" />
+				            <String fx:value="HI" />
+				            <String fx:value="ID" />
+				            <String fx:value="IL" />
+				            <String fx:value="IN" />
+				            <String fx:value="IA" />
+				            <String fx:value="KS" />
+				            <String fx:value="KY" />
+				            <String fx:value="LA" />
+				            <String fx:value="ME" />
+				            <String fx:value="MD" />
+				            <String fx:value="MA" />
+				            <String fx:value="MI" />
+				            <String fx:value="MN" />
+				            <String fx:value="MS" />
+				            <String fx:value="MO" />
+				            <String fx:value="MT" />
+				            <String fx:value="NE" />
+				            <String fx:value="NV" />
+				            <String fx:value="NH" />
+				            <String fx:value="NJ" />
+				            <String fx:value="NM" />
+				            <String fx:value="NY" />
+				            <String fx:value="NC" />
+				            <String fx:value="ND" />
+				            <String fx:value="OH" />
+				            <String fx:value="OK" />
+				            <String fx:value="OR" />
+				            <String fx:value="PA" />
+				            <String fx:value="RI" />
+				            <String fx:value="SC" />
+				            <String fx:value="SD" />
+				            <String fx:value="TN" />
+				            <String fx:value="TX" />
+				            <String fx:value="UT" />
+				            <String fx:value="VT" />
+				            <String fx:value="VA" />
+				            <String fx:value="WA" />
+				            <String fx:value="WV" />
+				            <String fx:value="WI" />
+				            <String fx:value="WY" />
+				            <String fx:value="DC" /> <!-- Washington D.C. -->
+				            <String fx:value="AS" /> <!-- American Samoa -->
+				            <String fx:value="GU" /> <!-- Guam -->
+				            <String fx:value="MP" /> <!-- Northern Mariana Islands -->
+				            <String fx:value="PR" /> <!-- Puerto Rico -->
+				            <String fx:value="VI" /> <!-- U.S. Virgin Islands -->
+				        </FXCollections>
+				    </items>
+				  </ComboBox>
+				  <TextField fx:id="zip" layoutX="490.0" layoutY="169.0" prefHeight="23.0" prefWidth="60.0" promptText="Zip" />
+                  <TextField fx:id="emailReg" layoutX="262.0" layoutY="169.0" prefHeight="23.0" prefWidth="137.0" promptText="Email" />
+                  <PasswordField fx:id="passwordReg" layoutX="262.0" layoutY="201.0" promptText="Password" />
+                  <PasswordField fx:id="passwordConf" layoutX="413.0" layoutY="201.0" promptText="Confirm Password" />
+                  <ImageView fitHeight="224.0" fitWidth="205.0" layoutX="31.0" layoutY="83.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@UGR%20Logo.jpg" />
+                     </image>
+                  </ImageView>
+                  <CheckBox fx:id="shareAddress" layoutX="230.0" layoutY="233.0" mnemonicParsing="false" text="Allow other users to see your address when purchasing?" />
+               </children>
+            </AnchorPane>
+         </content>
+      </Tab>
+      <Tab fx:id="forgotPasswordTab" text="Forgot Password?">
+         <content>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <Button fx:id="retrievePasswordButton" layoutX="343.0" layoutY="140.0" mnemonicParsing="false" onAction="#handleResetPasswordAction" text="Reset Password" />
+                  <Hyperlink fx:id="toLoginHyperlinkFromForgotPassword" layoutX="382.0" layoutY="259.0" onAction="#switchToLogin" text="Log In" />
+                  <TextField fx:id="emailForgot" layoutX="336.0" layoutY="100.0" prefHeight="23.0" prefWidth="137.0" promptText="Email" />
+                  <Text layoutX="327.0" layoutY="51.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome To">
+                     <font>
+                        <Font name="Broadway" size="24.0" />
+                     </font>
+                  </Text>
+                  <Text layoutX="249.0" layoutY="80.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Universal Gift Registry">
+                     <font>
+                        <Font name="Broadway" size="26.0" />
+                     </font>
+                  </Text>
+                  <ImageView fitHeight="224.0" fitWidth="205.0" layoutX="31.0" layoutY="83.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@UGR%20Logo.jpg" />
+                     </image>
+                  </ImageView>
+                  <Label fx:id="passwordRetrieved" alignment="CENTER" layoutX="339.0" layoutY="169.0" prefHeight="87.0" prefWidth="131.0" textAlignment="CENTER" wrapText="true" />
+               </children>
+            </AnchorPane>
+         </content>
+      </Tab>
+  </tabs>
+</TabPane>

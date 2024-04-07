@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--@application: UniversalGiftRegistry
+ * @author: Alexander Schoolcraft, Benjamin King, Brandon King, Gabe Woolums
+ * @date: 3/21/2024
+ * @version: 3.0
+ -->
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane fx:id="anchor" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="636.0" prefWidth="988.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.group_8.universal_gift_registry.SearchedListsController">
+   <children>
+      <TableView fx:id="ListTable" layoutY="136.0" prefHeight="377.0" prefWidth="988.0">
+         <columns>
+            <TableColumn fx:id="ListName" prefWidth="337.0" text="List Name" />
+            <TableColumn fx:id="Occasion" minWidth="0.0" prefWidth="550.0" text="Occasion" />
+            <TableColumn fx:id="EventDate" prefWidth="100" text="Event Date" />
+         </columns>
+      </TableView>
+      <Button layoutX="431.0" layoutY="545.0" mnemonicParsing="false" onAction="#handlePurchaseList" text="Purchase From List" />
+      <Text fx:id="ListHeader" layoutX="-1.0" layoutY="70.0" strokeType="OUTSIDE" strokeWidth="0.0" text="'s Registry Lists" textAlignment="CENTER" wrappingWidth="988.0">
+         <font>
+            <Font name="Broadway" size="34.0" />
+         </font>
+      </Text>
+      <Label fx:id="noListsFound" alignment="CENTER" layoutX="171.0" layoutY="324.0" prefHeight="33.0" prefWidth="155.0" text="Label" textAlignment="CENTER" wrapText="true" />
+      <Button layoutX="445.0" layoutY="586.0" mnemonicParsing="false" onAction="#handleBackToHome" text="Back to Home" />
+   </children>
+</AnchorPane>
