@@ -1,1 +1,0 @@
-When the server is offline or waking up, on Register Account action - should not pop up the sec questions page, instead should alert that the server is temporarily offline, and to try again shortly. // FIXED!
