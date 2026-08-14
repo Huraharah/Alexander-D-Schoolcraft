@@ -163,7 +163,7 @@ Independent research projects, publications, and actively developed software are
 More advanced independent and research projects are maintained separately:
 
 - [Transformer_Toy](https://github.com/Huraharah/Transformer_Toy)
-- [guardAInDBG](https://github.com/guardAIn-DBG/guardAIn_Debugger) <Currently not published publicly, will publish with FTC 2026, October 2026.>
+- [guardAInDBG](https://github.com/guardAIn-DBG/guardAIn_Debugger)
 - [Professional Portfolio](https://github.com/Huraharah/adschoolcraft)
 
 ## License
